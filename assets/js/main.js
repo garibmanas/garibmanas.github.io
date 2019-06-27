@@ -1,467 +1,668 @@
-/*---------------------------------------------
-Template name :  Bizidea
-Version       :  1.0
-Author        :  ThemeLooks
-Author url    :  http://themelooks.com
+/*! main.js | Bulkit | CSS Ninja */
 
-NOTE:
-------
-Please DO NOT EDIT THIS JS, you may need to use "custom.js" file for writing your custom js.
-We may release future updates so it will overwrite this file. it's better and safer to use "custom.js".
+/* ==========================================================================
+Website core JS file
+========================================================================== */
 
-[Table of Content]
+$(document).ready(function ($) {
 
-    01: Main Menu
-    02: Sticky Nav
-    03: Offcanvas
-    04: Background Image
-    05: Check Data
-    06: Owl Carousel
-    07: Counter Up
-    08: Video Popup
-    09: Changing svg color
-    10: Google map
-    11: Preloader
-    12: Isotope
-    13: Contact Form
-    14: Back to top button
-    15: Countdown
-----------------------------------------------*/
-
-
-(function ($) {
     "use strict";
 
-    /*===================
-    01: Main Menu
-    =====================*/
-    $('.header-menu a[href="#"]').on('click', function (event) {
-        event.preventDefault();
-    });
-
-    /* Menu Maker */
-    $(".main-menu").menumaker({
-        title: '<span></span>',
-        format: "multitoggle"
-    });
-
-    $($(window)).on('scroll', function () {
-        if (!$('ul.nav').hasClass('open')) {
-            $('#menu-button').removeClass('menu-opened');
-        };
-    });
-
-    /*========================
-    02: Sticky Nav
-    ==========================*/
-    $(window).on("scroll", function () {
-        var scroll = $(window).scrollTop();
-        if (scroll < 100) {
-            $(".header-main.style--one").removeClass("sticky fadeInDown animated");
-        }
-        else {
-            $(".header-main.style--one").addClass("sticky fadeInDown animated");
-        }
-    });
-
-    /*========================
-    03: Offcanvas
-    ==========================*/
-    $('.offcanvas-trigger').on('click', function () {
-        $('.offcanvas-wrapper').addClass('active');
-        $('.offcanvas-overlay').addClass('show');
-    });
-
-    $('.offcanvas-overlay,.offcanvas-close').on('click', function () {
-        $('.offcanvas-overlay').removeClass('show');
-        $('.offcanvas-wrapper').removeClass('active');
+    //Disable sidebar links in development
+    $('.is-submenu').each(function () {
+        $(this).attr('href', 'javascript:void(0);');
     })
 
-    /*========================
-    04: Background Image
-    ==========================*/
-    var $bgImg = $('[data-bg-img]');
-    $bgImg.css('background-image', function () {
-        return 'url("' + $(this).data('bg-img') + '")';
-    }).removeAttr('data-bg-img').addClass('bg-img');
+    
 
-    /*==================================
-    05: Check Data
-    ====================================*/
-    var checkData = function (data, value) {
-        return typeof data === 'undefined' ? value : data;
-    };
+    //Mobile menu toggle
+    if ($('.custom-burger').length) {
+        $('.custom-burger').on("click", function () {
 
-    /*==================================
-    06: Owl Carousel
-    ====================================*/
-    var $owlCarousel = $('.owl-carousel');
-    $owlCarousel.each(function () {
-        var $t = $(this);
-
-        $t.owlCarousel({
-            items: checkData($t.data('owl-items'), 1),
-            margin: checkData($t.data('owl-margin'), 0),
-            loop: checkData($t.data('owl-loop'), true),
-            smartSpeed: 450,
-            autoplay: checkData($t.data('owl-autoplay'), true),
-            autoplayTimeout: checkData($t.data('owl-speed'), 8000),
-            center: checkData($t.data('owl-center'), false),
-            animateIn: checkData($t.data('owl-animate-in'), false),
-            animateOut: checkData($t.data('owl-animate-out'), false),
-            nav: checkData($t.data('owl-nav'), false),
-            navText: ['<img src="assets/img/icons/angle-left.svg" class="svg">', '<img src="assets/img/icons/angle-right.svg" class="svg">'],
-            dots: checkData($t.data('owl-dots'), false),
-            responsive: checkData($t.data('owl-responsive'), {})
-        });
-    });
-
-    /*==================================
-    07: Counter Up
-    ====================================*/
-    $(".count span").counterUp({
-        delay: 30,
-        time: 2000
-    });
-
-    /*========================
-    08: Video Popup
-    ==========================*/
-    var $popUpVideo = $('.popup-video');
-    if ($popUpVideo.length) {
-        $popUpVideo.magnificPopup({
-            type: 'iframe'
-        });
-    };
-
-    /*==================================
-    09: Changing svg color 
-    ====================================*/
-    jQuery('img.svg').each(function () {
-        var $img = jQuery(this);
-        var imgID = $img.attr('id');
-        var imgClass = $img.attr('class');
-        var imgURL = $img.attr('src');
-
-        jQuery.get(imgURL, function (data) {
-            // Get the SVG tag, ignore the rest
-            var $svg = jQuery(data).find('svg');
-
-            // Add replaced image's ID to the new SVG
-            if (typeof imgID !== 'undefined') {
-                $svg = $svg.attr('id', imgID);
-            }
-            // Add replaced image's classes to the new SVG
-            if (typeof imgClass !== 'undefined') {
-                $svg = $svg.attr('class', imgClass + ' replaced-svg');
-            }
-
-            // Remove any invalid XML tags as per http://validator.w3.org
-            $svg = $svg.removeAttr('xmlns:a');
-
-            // Check if the viewport is set, else we gonna set it if we can.
-            if (!$svg.attr('viewBox') && $svg.attr('height') && $svg.attr('width')) {
-                $svg.attr('viewBox', '0 0 ' + $svg.attr('height') + ' ' + $svg.attr('width'));
-            }
-
-            // Replace image with new SVG
-            $img.replaceWith($svg);
-
-        }, 'xml');
-    });
-
-    /*==================================
-    10: Google map 
-    ====================================*/
-    var $map = $('[data-trigger="map"]'),
-        $mapOps;
-
-    if ($map.length) {
-        // Map Options
-        $mapOps = $map.data('map-options');
-
-        // Map Initialization
-        window.initMap = function () {
-            $map.css('min-height', '600px');
-            $map.each(function () {
-                var $t = $(this), map, lat, lng, zoom;
-
-                $mapOps = $t.data('map-options');
-                lat = parseFloat($mapOps.latitude, 10);
-                lng = parseFloat($mapOps.longitude, 10);
-                zoom = parseFloat($mapOps.zoom, 10);
-
-                map = new google.maps.Map($t[0], {
-                    center: { lat: lat, lng: lng },
-                    zoom: zoom,
-                    scrollwheel: false,
-                    disableDefaultUI: true,
-                    zoomControl: true,
-                    styles: 
-                        [
-                            {
-                                "featureType": "all",
-                                "elementType": "labels.text.fill",
-                                "stylers": [
-                                    {
-                                        "saturation": 36
-                                    },
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 40
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "all",
-                                "elementType": "labels.text.stroke",
-                                "stylers": [
-                                    {
-                                        "visibility": "on"
-                                    },
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 16
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "all",
-                                "elementType": "labels.icon",
-                                "stylers": [
-                                    {
-                                        "visibility": "off"
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "administrative",
-                                "elementType": "geometry.fill",
-                                "stylers": [
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 20
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "administrative",
-                                "elementType": "geometry.stroke",
-                                "stylers": [
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 17
-                                    },
-                                    {
-                                        "weight": 1.2
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "landscape",
-                                "elementType": "geometry",
-                                "stylers": [
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 20
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "poi",
-                                "elementType": "geometry",
-                                "stylers": [
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 21
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "road.highway",
-                                "elementType": "geometry.fill",
-                                "stylers": [
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 17
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "road.highway",
-                                "elementType": "geometry.stroke",
-                                "stylers": [
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 29
-                                    },
-                                    {
-                                        "weight": 0.2
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "road.arterial",
-                                "elementType": "geometry",
-                                "stylers": [
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 18
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "road.local",
-                                "elementType": "geometry",
-                                "stylers": [
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 16
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "transit",
-                                "elementType": "geometry",
-                                "stylers": [
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 19
-                                    }
-                                ]
-                            },
-                            {
-                                "featureType": "water",
-                                "elementType": "geometry",
-                                "stylers": [
-                                    {
-                                        "color": "#000000"
-                                    },
-                                    {
-                                        "lightness": 17
-                                    }
-                                ]
-                            }
-                        ]
-                });
-
-                map = new google.maps.Marker({
-                    position: { lat: lat, lng: lng },
-                    map: map,
-                    animation: google.maps.Animation.DROP,
-                    draggable: false,
-                    icon: 'assets/img/map-marker.png'
-                });
-
-            });
-        };
-        initMap();
-    };
-
-    /*==================================
-    11: Preloader 
-    ====================================*/
-    $(window).on('load', function () {
-        $('.preloader').fadeOut(1000);
-    });
-
-    /*==================================
-    12: Isotope
-    ====================================*/
-    $(window).on('load', function () {
-        $('.project-items').isotope({
-            itemSelector: '.grid-item',
-            percentPosition: true,
-            animationOptions: {
-                duration: 750,
-                easing: "linear",
-                queue: false
-            },
-            masonry: {
-                columnWidth: '.grid-item'
-            }
-        });
-
-        $('.project_filter li').on('click', function () {
-            $(this).addClass('active').siblings().removeClass('active');
-            var filterValue = $(this).attr('data-filter');
-            $('.grid').isotope({
-                filter: filterValue
-            });
-        });
-    });
-
-    /*==================================
-    13: Contact Form
-    ====================================*/
-    $('.contact-form-wrapper').on('submit', 'form', function (e) {
-        e.preventDefault();
-
-        var $el = $(this);
-
-        $.post($el.attr('action'), $el.serialize(), function (res) {
-            res = $.parseJSON(res);
-            $el.parent('.contact-form-wrapper').find('.form-response').html('<span>' + res[1] + '</span>');
-        });
-    });
-
-    /*============================================
-    14: Back to top button
-    ==============================================*/
-    var $backToTopBtn = $('.back-to-top');
-
-    if ($backToTopBtn.length) {
-        var scrollTrigger = 400, // px
-            backToTop = function () {
-                var scrollTop = $(window).scrollTop();
-                if (scrollTop > scrollTrigger) {
-                    $backToTopBtn.addClass('show');
-                } else {
-                    $backToTopBtn.removeClass('show');
-                }
-            };
-
-        backToTop();
-
-        $(window).on('scroll', function () {
-            backToTop();
-        });
-
-        $backToTopBtn.on('click', function (e) {
-            e.preventDefault();
-            $('html,body').animate({
-                scrollTop: 0
-            }, 700);
+            var menu_id = $(this).attr('data-target');
+            $(this).toggleClass('is-active');
+            $("#" + menu_id).toggleClass('is-active');
+            $('.navbar.is-light').toggleClass('is-dark-mobile')
         });
     }
 
-    /*==================================
-    15: Countdown
-    ====================================*/
-    $('#countdown').countdown({
-        date: '08/16/2020 23:59:59'
+
+
+    //Highlight current page navbar menu item
+    if ($('.nav').length) {
+        // Get current page URL
+        var url = window.location.href;
+
+        // remove # from URL
+        url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
+
+        // remove parameters from URL
+        url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
+
+        // select file name
+        url = url.substr(url.lastIndexOf("/") + 1);
+
+        // If file name not available
+        if (url == '') {
+            url = 'index.html';
+        }
+
+        // Loop all menu items
+        $('.nav .navbar-item, li.has-children ul li a.is-submenu, a.footer-nav-link').each(function () {
+
+            // select href
+            var href = $(this).attr('href');
+
+            // Check filename
+            if (url == href) {
+
+                // Add active class
+                $(this).addClass('is-active');
+            }
+        });
+    }
+
+    //Page loader
+    if ($('.pageloader').length) {
+
+        $('.pageloader').toggleClass('is-active');
+
+        $(window).on('load', function () {
+            var pageloaderTimeout = setTimeout(function () {
+                $('.pageloader').toggleClass('is-active');
+                $('.infraloader').toggleClass('is-active')
+                clearTimeout(pageloaderTimeout);
+            }, 700);
+        })
+    }
+
+    //Website sidebar
+    $(".navigation-menu > li.has-children a.parent-link").on("click", function (i) {
+        i.preventDefault();
+        if (!$(this).parent().hasClass("active")) {
+            $(".navigation-menu li ul").slideUp();
+            $(this).next().slideToggle();
+            $(".navigation-menu li").removeClass("active");
+            $(this).parent().addClass("active");
+        }
+        else {
+            $(this).next().slideToggle();
+            $(".navigation-menu li").removeClass("active");
+        }
+    });
+    //sidebar category toggle
+    $('.category-link').on("click", function () {
+        $('.category-link.is-active').removeClass('is-active');
+        $(this).addClass('is-active');
+    })
+    //Sidebar close button
+    $('.hamburger-btn').on("click", function () {
+        $('#navigation-trigger .menu-toggle .icon-box-toggle, .navigation-close .menu-toggle .icon-box-toggle, .navigation-trigger .menu-toggle .icon-box-toggle, .navigation-close .menu-toggle .icon-box-toggle').toggleClass('active');
+    })
+    //Menu buttons sync
+    $('#navigation-trigger, .navigation-trigger, .navigation-close').on("click", function () {
+        $('.side-navigation-menu').toggleClass('is-active');
+    })
+    //Data navigation menu setup
+    $('.category-link').on("click", function () {
+        var category_id = $(this).attr('data-navigation-menu');
+        $('.navigation-menu-wrapper').addClass('is-hidden');
+        $("#" + category_id).removeClass('is-hidden');
+    })
+    //Manage close links visibility to display only one at a time
+    $('.side-navigation-menu').on("mouseenter", function () {
+        $('#navigation-trigger').css('opacity', '0');
+        $('.navigation-close').css('opacity', '1');
+    })
+    $('.side-navigation-menu').on("mouseleave", function () {
+        $('#navigation-trigger').css('opacity', '1');
+        $('.navigation-close').css('opacity', '0');
+    })
+
+
+    // Popovers init
+    if ($('[data-toggle="popover"]').length) {
+        $('[data-toggle="popover"]').ggpopover();
+    }
+
+    // tooltips init
+    if ($('[data-toggle="tooltip"]').length) {
+        $('[data-toggle="tooltip"]').ggtooltip();
+    }
+
+    //Responsive toggle 
+    $('.custom-burger').on('click', function () {
+        $(this).find('.icon-box-toggle').toggleClass('active');
+    })
+
+
+    //Navbar fade
+    if ($('.navbar-wrapper.navbar-fade.navbar-light').length) {
+        $(".navbar-wrapper.navbar-fade").wrap('<div class="navbar-placeholder"></div>');
+        $(".navbar-placeholder").height(jQuery(".navbar-wrapper.navbar-fade").outerHeight());
+        $(window).on('scroll', function () {    // this will work when your window scrolled.
+            var height = $(window).scrollTop();  //getting the scrolling height of window
+            if (height > 65) {
+                $(".navbar-wrapper.navbar-fade.is-transparent").removeClass('is-transparent navbar-light').addClass('navbar-faded');
+            } else {
+                $(".navbar-wrapper").removeClass('navbar-faded').addClass('is-transparent navbar-light');
+            }
+        });
+    }
+
+    //Navbar fade
+    if ($('.navbar-wrapper.navbar-fade.navbar-default').length) {
+        $(".navbar-wrapper.navbar-fade").wrap('<div class="navbar-placeholder"></div>');
+        $(".navbar-placeholder").height(jQuery(".navbar-wrapper.navbar-fade").outerHeight());
+        $(window).on('scroll', function () {    // this will work when your window scrolled.
+            var height = $(window).scrollTop();  //getting the scrolling height of window
+            if (height > 65) {
+                $(".navbar-wrapper.navbar-fade.is-transparent").removeClass('is-transparent').addClass('navbar-faded');
+            } else {
+                $(".navbar-wrapper").removeClass('navbar-faded').addClass('is-transparent');
+            }
+        });
+    }
+
+    //Navbar Clone
+    if ($('.is-cloned').length) {
+        $(window).scroll(function () {    // this will work when your window scrolled.
+            var height = $(window).scrollTop();  //getting the scrolling height of window
+            if (height > 50) {
+                $(".is-cloned").addClass('is-active');
+            } else {
+                $(".is-cloned").removeClass('is-active');
+            }
+        });
+    }
+
+    //Attribute background images
+    if ($('.has-background-image').length) {
+        $(".has-background-image").each(function () {
+            var bgImage = $(this).attr('data-background');
+            if (bgImage !== undefined) {
+                $(this).css('background-image', 'url(' + bgImage + ')');
+            }
+        }
+        )
+    }
+
+    //Media card background images
+    if ($('.media-card-image').length) {
+        $(".media-card-image").each(function () {
+            var mediaCardImage = $(this).attr('data-background');
+            if (mediaCardImage !== undefined) {
+                $(this).css('background-image', 'url(' + mediaCardImage + ')');
+            }
+        }
+        )
+    }
+
+    //Parallax setup
+    function parallaxBG() {
+        $('.parallax').prepend('<div class="parallax-overlay"></div>');
+        $(".parallax").each(function () {
+            var attrImage = $(this).attr('data-background');
+            var attrColor = $(this).attr('data-color');
+            var attrOpacity = $(this).attr('data-color-opacity');
+            var attrPositionX = $(this).attr('data-position-x');
+            if (attrImage !== undefined) {
+                $(this).css('background-image', 'url(' + attrImage + ')');
+            }
+            if (attrColor !== undefined) {
+                $(this).find(".parallax-overlay").css('background-color', '' + attrColor + '');
+            }
+            if (attrOpacity !== undefined) {
+                $(this).find(".parallax-overlay").css('opacity', '' + attrOpacity + '');
+            }
+            if (attrPositionX !== undefined) {
+                $(this).css('background-position-x', '' + attrPositionX + '');
+            }
+        });
+    }
+    parallaxBG();
+
+    if ("ontouchstart" in window) {
+        document.documentElement.className = document.documentElement.className + " touch";
+    }
+    if (!$("html").hasClass("touch")) {
+        $(".parallax").css("background-attachment", "fixed");
+    }
+
+    function fullscreenFix() {
+        var h = $('body').height();
+        $(".content-b").each(function (i) {
+            if ($(this).innerHeight() > h) {
+                $(this).closest(".fullscreen").addClass("overflow");
+            }
+        });
+    }
+    $(window).resize(fullscreenFix);
+    fullscreenFix();
+
+    function backgroundResize() {
+        var windowH = $(window).height();
+        $(".parallax").each(function (i) {
+            var path = $(this);
+            var contW = path.width();
+            var contH = path.height();
+            var imgW = path.attr("data-img-width");
+            var imgH = path.attr("data-img-height");
+            var ratio = imgW / imgH;
+            var diff = 0;
+            diff = diff ? diff : 0;
+            var remainingH = 0;
+            if (path.hasClass("parallax") && !$("html").hasClass("touch")) {
+                remainingH = windowH - contH;
+            }
+            imgH = contH + remainingH + diff;
+            imgW = imgH * ratio;
+            if (contW > imgW) {
+                imgW = contW;
+                imgH = imgW / ratio;
+            }
+            path.data("resized-imgW", imgW);
+            path.data("resized-imgH", imgH);
+            path.css("background-size", imgW + "px " + imgH + "px");
+        });
+    }
+    $(window).resize(backgroundResize);
+    $(window).focus(backgroundResize);
+    backgroundResize();
+
+    function parallaxPosition(e) {
+        var heightWindow = $(window).height();
+        var topWindow = $(window).scrollTop();
+        var bottomWindow = topWindow + heightWindow;
+        var currentWindow = (topWindow + bottomWindow) / 2;
+        $(".parallax").each(function (i) {
+            var path = $(this);
+            var height = path.height();
+            var top = path.offset().top;
+            var bottom = top + height;
+            if (bottomWindow > top && topWindow < bottom) {
+                var imgH = path.data("resized-imgH");
+                var min = 0;
+                var max = -imgH + heightWindow;
+                var overflowH = height < heightWindow ? imgH - height : imgH - heightWindow;
+                top = top - overflowH;
+                bottom = bottom + overflowH;
+                var value = 0;
+                if ($('.parallax').is(".titlebar")) {
+                    value = min + (max - min) * (currentWindow - top) / (bottom - top) * 2;
+                } else {
+                    value = min + (max - min) * (currentWindow - top) / (bottom - top);
+                }
+                var orizontalPosition = path.attr("data-oriz-pos");
+                orizontalPosition = orizontalPosition ? orizontalPosition : "50%";
+                $(this).css("background-position", orizontalPosition + " " + value + "px");
+            }
+        });
+    }
+    if (!$("html").hasClass("touch")) {
+        $(window).resize(parallaxPosition);
+        $(window).scroll(parallaxPosition);
+        parallaxPosition();
+    }
+    if (navigator.userAgent.match(/Trident\/7\./)) {
+        $('body').on("mousewheel", function () {
+            event.preventDefault();
+            var wheelDelta = event.wheelDelta;
+            var currentScrollPosition = window.pageYOffset;
+            window.scrollTo(0, currentScrollPosition - wheelDelta);
+        });
+    }
+
+    // Back to Top button behaviour
+    var pxShow = 600;
+    var scrollSpeed = 500;
+    $(window).on('scroll', function () {
+        if ($(window).scrollTop() >= pxShow) {
+            $("#backtotop").addClass('visible');
+        } else {
+            $("#backtotop").removeClass('visible');
+        }
+    });
+    $('#backtotop a').on('click', function () {
+        $('html, body').animate({
+            scrollTop: 0
+        }, scrollSpeed);
+        return false;
     });
 
-}(jQuery));
+    // Chat widget button
+    var chatShow = 100;
+    $(window).on('scroll', function () {
+        if ($(window).scrollTop() >= chatShow) {
+            $("#bulchat").addClass('visible');
+        } else {
+            $("#bulchat").removeClass('visible');
+        }
+    });
+
+    //Tabs Nav
+    var $tabsNav = $('.tabs-nav'),
+        $tabsNavLis = $tabsNav.children('li');
+
+    $tabsNav.each(function () {
+        var $this = $(this);
+        $this.next().children('.tab-content').stop(true, true).hide().first().show();
+    });
+
+    $tabsNavLis.on('click', function (e) {
+        var $this = $(this);
+        $this.siblings().removeClass('active').end().addClass('active');
+        $this.parent().next().children('.tab-content').stop(true, true).hide().siblings($this.find('a').attr('href')).fadeIn();
+        e.preventDefault();
+    });
+
+    var hash = window.location.hash;
+    var anchor = $('.tabs-nav a[href="' + hash + '"]');
+
+    if (anchor.length === 0) {
+        $(".tabs-nav li:first").addClass("active").show();
+        $(".tab-content:first").show();
+    } else {
+        anchor.parent('li').click();
+    }
+
+    //Navigation Tabs
+    $('.navigation-tabs ul li').on('click', function () {
+        var tab_id = $(this).attr('data-tab');
+
+        $(this).siblings('li').removeClass('is-active');
+        $(this).closest('.navigation-tabs').children('.navtab-content').removeClass('is-active');
+        //$('.navtab-content').removeClass('is-active');
+
+        $(this).addClass('is-active');
+        $("#" + tab_id).addClass('is-active');
+    })
+
+    //Scrollspy nav
+    $('li.scrollnav-item').on('click', function () {
+        $('li.scrollnav-item.is-active').removeClass('is-active');
+        $(this).addClass('is-active');
+    })
+
+    //Preloader
+    $(window).on('load', function () { // makes sure the whole site is loaded 
+        $('#status').fadeOut(); // will first fade out the loading animation 
+        $('#preloader').delay(350).fadeOut('slow'); // will fade out the white DIV that covers the website. 
+        $('body').delay(350).css({ 'overflow': 'visible' });
+    })
+
+    //Datepicker initialization
+    if ($('#is-datepicker').length) {
+        $('#is-datepicker').dateDropper();
+    }
+
+    //Timepicker initialization
+    if ($('#is-timepicker').length) {
+        $('#is-timepicker').timeDropper({
+            primaryColor: '#4FC1EA',
+            borderColor: "#4FC1EA",
+            backgroundColor: "#FFF",
+            init_animation: 'fadeIn',
+        });
+    }
+
+    //Animates an item with g-item class on hover
+    $('.g-item').on("mouseenter", function () {
+        $(this).addClass('gelatine');
+    })
+    $('.g-item').on("mouseleave", function () {
+        $(this).removeClass('gelatine');
+    })
+
+    $('a[href*="#"]:not([href="#"])').click(function () {
+        if (location.pathname.replace(/^\//, '') === this.pathname.replace(/^\//, '') && location.hostname === this.hostname) {
+            var target = $(this.hash);
+            target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+            if ($(".nav-primary").hasClass("nav-primary-fixed")) {
+                if (target.length) {
+                    $('html, body').animate({
+                        scrollTop: target.offset().top - 40
+                    }, 750);
+                    return false;
+                }
+            } else {
+                if (target.length) {
+                    $('html, body').animate({
+                        scrollTop: target.offset().top - 80
+                    }, 750);
+                    return false;
+                }
+            }
+        }
+    });
+
+    //Basic slick carousel (testimonials)
+    if ($('.testimonials').length) {
+        $('.testimonials').slick({
+            dots: true,
+            infinite: true,
+            speed: 500,
+            cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1.000)',
+            autoplay: true,
+
+        });
+    }
+
+    //Styled slick carousel (testimonials in landing v5)
+    if ($('.styled-testimonials').length) {
+        $('.styled-testimonials').slick({
+            dots: true,
+            infinite: true,
+            speed: 500,
+            cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1.000)',
+            autoplay: true,
+            arrows: false,
+        });
+    }
+
+    //Vertical slick carousel (vertical testimonials)
+    if ($('.vertical-testimonials').length) {
+        $('.vertical-testimonials').slick({
+            autoplay: true,
+            arrows: false,
+            dots: false,
+            slidesToShow: 4,
+            centerPadding: "0",
+            centerMode: true,
+            draggable: false,
+            infinite: true,
+            pauseOnHover: false,
+            swipe: false,
+            touchMove: false,
+            vertical: true,
+            speed: 1000,
+            autoplaySpeed: 2500,
+            useTransform: true,
+            cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1.000)',
+            adaptiveHeight: true,
+
+        });
+    }
+
+    //Flat slick carousel
+    if ($('.flat-testimonials').length) {
+        $('.flat-testimonials').slick({
+            dots: true,
+            infinite: true,
+            speed: 500,
+            cssEase: 'cubic-bezier(0.645, 0.045, 0.355, 1.000)',
+            autoplay: true,
+            autoplaySpeed: 5000,
+            arrows: true,
+        });
+    }
+
+    //Image slick carousel
+    if ($('.image-carousel').length) {
+        $('.image-carousel').slick({
+            centerMode: true,
+            dots: true,
+            infinite: true,
+            autoplay: true,
+            autoplaySpeed: 2000,
+            centerPadding: '60px',
+            prevArrow: "<div class='slick-custom is-prev'><i class='fa fa-chevron-left'></i></div>",
+            nextArrow: "<div class='slick-custom is-next'><i class='fa fa-chevron-right'></i></div>",
+            slidesToShow: 3,
+            responsive: [
+                {
+                    breakpoint: 768,
+                    settings: {
+                        arrows: false,
+                        centerMode: true,
+                        centerPadding: '40px',
+                        slidesToShow: 3
+                    }
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        arrows: false,
+                        centerMode: true,
+                        centerPadding: '40px',
+                        slidesToShow: 1
+                    }
+                }
+            ]
+        });
+    }
+
+    //Single image slick carousel
+    if ($('.single-image-carousel').length) {
+        $('.single-image-carousel').slick({
+            infinite: true,
+            dots: true,
+            autoplay: true,
+            autoplaySpeed: 2000,
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            prevArrow: "<div class='slick-custom is-prev'><i class='fa fa-chevron-left'></i></div>",
+            nextArrow: "<div class='slick-custom is-next'><i class='fa fa-chevron-right'></i></div>",
+            responsive: [
+                {
+                    breakpoint: 768,
+                    settings: {
+                        arrows: false,
+                        centerMode: false,
+                        //centerPadding: '40px',
+                        slidesToShow: 1
+                    }
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        arrows: false,
+                        centerMode: false,
+                        //centerPadding: '40px',
+                        slidesToShow: 1
+                    }
+                }
+            ]
+        });
+    }
+
+    //Multiple images slick carousel
+    if ($('.multiple-image-carousel').length) {
+        $('.multiple-image-carousel').slick({
+            infinite: true,
+            dots: true,
+            slidesToShow: 3,
+            slidesToScroll: 3,
+            prevArrow: "<div class='slick-custom is-prev'><i class='fa fa-chevron-left'></i></div>",
+            nextArrow: "<div class='slick-custom is-next'><i class='fa fa-chevron-right'></i></div>",
+            responsive: [
+                {
+                    breakpoint: 768,
+                    settings: {
+                        arrows: false,
+                        centerMode: true,
+                        centerPadding: '40px',
+                        slidesToShow: 3
+                    }
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        arrows: false,
+                        centerMode: true,
+                        centerPadding: '40px',
+                        slidesToShow: 1
+                    }
+                }
+            ]
+        });
+    }
+
+    //Video embed init
+    if ($('#video-embed').length) {
+        Video('#video-embed');
+    }
+
+    //Counter up init
+    if ($('.counter').length) {
+        $('.counter').counterUp({
+            delay: 10,
+            time: 1000
+        });
+    }
+
+    //Chosen select init
+    if ($('.chosen-select').length) {
+        $(".chosen-select").chosen({
+            disable_search_threshold: 6,
+            width: '100%'
+        });
+    }
+
+    //Chosen select multiple init
+    if ($('.chosen-multiple').length) {
+        $(".chosen-multiple").chosen({
+            disable_search_threshold: 10,
+            max_selected_options: 5,
+            width: '100%'
+        });
+    }
+
+
+    //Accordion init
+    var $accor = $('.accordion');
+    $accor.each(function () {
+        $(this).toggleClass('ui-accordion ui-widget ui-helper-reset');
+        $(this).find('h3').addClass('ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-corner-all');
+        $(this).find('div').addClass('ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom');
+        $(this).find("div").hide();
+    });
+    var $trigger = $accor.find('h3');
+    $trigger.on('click', function (e) {
+        var location = $(this).parent();
+        if ($(this).next().is(':hidden')) {
+            var $triggerloc = $('h3', location);
+            $triggerloc.removeClass('ui-accordion-header-active ui-state-active ui-corner-top').next().slideUp(300);
+            $triggerloc.find('span').removeClass('ui-accordion-icon-active');
+            $(this).find('span').addClass('ui-accordion-icon-active');
+            $(this).addClass('ui-accordion-header-active ui-state-active ui-corner-top').next().slideDown(300);
+        }
+        e.preventDefault();
+    });
+    $(".toggle-container").hide();
+    $('.trigger, .trigger.opened').on('click', function (a) {
+        $(this).toggleClass('active');
+        a.preventDefault();
+    });
+    $(".trigger").on('click', function () {
+        $(this).next(".toggle-container").slideToggle(300);
+    });
+    $(".trigger.opened").addClass("active").next(".toggle-container").show();
+
+    //Cover video
+    if ($('.covervid-video').length) {
+        $('.covervid-video').coverVid(1920, 1080);
+    }
+
+
+})
